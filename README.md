@@ -1,131 +1,133 @@
-# Traffic Sign Classification with CNNs
+# Traffic Sign Classification with Convolutional Neural Networks
 
-A PyTorch deep learning project implementing and comparing multiple convolutional neural network architectures for 4-class road sign detection, including a custom ResNet with residual blocks built from scratch.
+A PyTorch deep learning project comparing five CNN architectures on a 4-class road sign detection task, built and trained on Google Colab Pro (A100 GPU).
 
-## Overview
+**Dataset:** [Kaggle Road Sign Detection](https://www.kaggle.com/datasets/andrewmvd/road-sign-detection)  
+**Classes:** Traffic Light · Stop · Speed Limit · Crosswalk  
+**Models:** Baseline CNN → Max Pooling → Batch Normalization → Dropout → ResNet
 
-This project explores how architectural choices — pooling, batch normalization, dropout, and residual connections — affect model performance on an image classification task. All models are trained and evaluated on the [Kaggle Road Sign Detection dataset](https://www.kaggle.com/datasets/andrewmvd/road-sign-detection), which contains four classes: **Traffic Light**, **Stop**, **Speed Limit**, and **Crosswalk**.
+---
 
-## Models Implemented
+## Models
 
-| Model | Key Feature |
+| Model | Description |
 |---|---|
-| `ConvNet` | Baseline 3-layer CNN with strided convolutions |
-| `ConvNetMaxPooling` | Adds max pooling after each conv block for spatial downsampling |
-| `ConvNetBN` | Custom batch normalization from scratch |
-| `ConvNetDropout` | Custom dropout (inverted dropout) for regularization |
+| `ConvNet` | Baseline: 3 strided conv layers + 2 FC layers, no pooling |
+| `ConvNetMaxPooling` | Adds 2×2 max pooling after each conv block |
+| `ConvNetBN` | Adds custom batch normalization (implemented from scratch) |
+| `ConvNetDropout` | Adds inverted dropout (p=0.5) as a regularizer |
 | `ResNet` | Full residual network with skip connections and stacked residual blocks |
 
-## Architecture Details
+All implementations are in `models.py`. `BatchNormalization` and `CustomDropout` are both built from PyTorch primitives without using `nn.BatchNorm2d` or `nn.Dropout`.
 
-**Baseline ConvNet**
-- 3 convolutional layers (4 → 16 → 32 channels), kernel size 3, stride 2, padding 1
-- 2 fully connected layers (1024 → 4 classes)
-- ReLU activations throughout
-
-**Custom BatchNormalization**
-- Implemented from scratch using PyTorch primitives
-- Tracks running mean/variance for inference mode
-- Learnable scale (γ) and shift (β) parameters per channel
-
-**Custom Dropout**
-- Inverted dropout: scales activations at training time, identity at inference
-- Applied after the FC layer with p=0.5
-
-**ResNet**
-- Residual blocks with 3×3 conv → BN → ReLU → 3×3 conv + skip connection
-- Projection shortcut (1×1 conv) when channel dimensions change
-- Two stacked block layers followed by adaptive average pooling
-
-## Training Pipeline
-
-The `train()` function implements the standard supervised learning loop:
-
-```python
-for epoch in range(epochs):
-    for inputs, labels in data_loader:
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-```
-
-- **Loss function:** Cross-Entropy Loss
-- **Optimizer:** SGD / Adam (configurable)
-- **Tracking:** Train and validation loss logged per epoch for learning curve analysis
-
-## Setup & Usage
-
-**Requirements**
-```
-torch
-torchvision
-numpy
-pandas
-matplotlib
-Pillow
-```
-
-Install dependencies:
-```bash
-pip install torch torchvision numpy pandas matplotlib Pillow
-```
-
-**Run training**
-```python
-from submission import ConvNet, ResNet, train
-import torch
-import torch.nn as nn
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-model = ResNet(num_blocks=2, layer1_channel=64, layer2_channel=128, out_channel=256).to(device)
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-
-train_losses, val_losses = train(model, train_dataloader, val_dataloader, criterion, optimizer, epochs=20, device=device)
-```
-
-**Data loading**
-```python
-# Load pre-processed pickle datasets
-train_dataset = load_dataset("train", base_dir)
-val_dataset   = load_dataset("val", base_dir)
-test_dataset  = load_dataset("test", base_dir, test_mode=True)
-```
-
-Images are pre-processed to 64×64 and normalized:
-```python
-transforms.Resize((64, 64))
-transforms.Normalize([0.491, 0.488, 0.512], [0.249, 0.248, 0.234])
-```
+---
 
 ## Project Structure
 
 ```
-├── Assignment_1.ipynb   # Full experiment notebook with analysis and plots
-├── submission.py        # Model implementations and training loop
-├── train_data.pkl       # Training set
-├── val_data.pkl         # Validation set
-├── test_data.pkl        # Test set
-└── README.md
+traffic-sign-cnn-pytorch/
+├── models.py                  # All model architectures and training utilities
+├── Traffic_Sign_CNN.ipynb     # Experiment notebook: data loading, training, results
+├── requirements.txt
+├── .gitignore
+├── README.md
+└── results/
+    ├── loss_curves.png        # Train/val loss curves for all 5 models
+    └── resnet_predictions.csv # ResNet predictions on the held-out test set
 ```
 
-## Skills Demonstrated
+---
 
-- **PyTorch model design** — building custom `nn.Module` classes with full control over forward passes
-- **Training loop engineering** — gradient zeroing, backprop, optimizer stepping, loss tracking
-- **Regularization techniques** — batch normalization and dropout implemented from first principles
-- **Residual networks** — skip connections with projection shortcuts for dimension matching
-- **Hyperparameter analysis** — learning rate sweeps with performance curve visualization
-- **Data pipeline** — custom `Dataset` and `DataLoader` for pickle-serialized image data
+## Quickstart
 
-## Relevance to ML Engineering
+### Running in Google Colab (recommended)
 
-This project directly demonstrates:
-- Hands-on experience with **PyTorch** and deep learning model implementation
-- Understanding of **CNN architectures** and the effect of architectural choices on convergence
-- Implementation of **batch normalization** and **dropout from scratch** (not just using library calls)
-- **Model evaluation** with train/val loss tracking and learning curve analysis
-- Structured, readable Python code following ML engineering conventions
+1. Open `Traffic_Sign_CNN.ipynb` in [Google Colab](https://colab.research.google.com)
+2. Set runtime to GPU: Runtime → Change runtime type → A100
+3. Run all cells — the notebook will:
+   - Clone this repo to access `models.py`
+   - Download the dataset directly from Kaggle
+   - Preprocess images into train/val/test splits
+   - Train all five models and plot loss curves
+   - Save predictions to `results/`
+
+> **Kaggle API token required.** When prompted, upload your `kaggle.json` file. Get it from [kaggle.com](https://www.kaggle.com) → Your Profile → Settings → API → Create New Token.
+
+### Running Locally
+
+```bash
+git clone https://github.com/YOUR_USERNAME/traffic-sign-cnn-pytorch
+cd traffic-sign-cnn-pytorch
+pip install -r requirements.txt
+jupyter notebook Traffic_Sign_CNN.ipynb
+```
+
+---
+
+## Requirements
+
+```
+torch>=2.0.0
+torchvision>=0.15.0
+numpy
+matplotlib
+Pillow
+pandas
+kaggle
+```
+
+Install with:
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Data Pipeline
+
+Raw images are downloaded from Kaggle and preprocessed into `.pkl` splits by the notebook. The following transforms are applied:
+
+```python
+transforms.Resize((64, 64))
+transforms.ToTensor()
+transforms.Normalize([0.491, 0.488, 0.512], [0.249, 0.248, 0.234])
+```
+
+Splits: 70% train · 15% validation · 15% test. The `.pkl` files are generated at runtime and are not committed to the repo.
+
+---
+
+## Training Setup
+
+All models are trained with identical settings for a fair comparison:
+
+| Setting | Value |
+|---|---|
+| Optimizer | SGD (momentum=0.9) |
+| Learning rate | 0.001 |
+| Epochs | 40 |
+| Batch size | 32 |
+| Loss function | Cross-entropy |
+| Hardware | Google Colab Pro (A100 GPU) |
+
+---
+
+## Results
+
+- **Baseline CNN** establishes the performance floor with reasonable but slower convergence
+- **MaxPooling** improves generalization by reducing spatial dimensions
+- **BatchNorm** produces the smoothest loss curves and fastest convergence
+- **Dropout** shows higher training loss (expected from regularization) but competitive validation performance
+- **ResNet** achieves the best overall validation loss — skip connections enable more effective gradient flow and richer feature learning
+
+---
+
+## Key Implementation Details
+
+**Custom BatchNormalization** — tracks running mean/variance via EMA for inference, applies learnable γ and β per channel, handles (B, C, H, W) broadcasting manually.
+
+**Custom Dropout** — inverted dropout: scales surviving activations by `1/(1-p)` at training time, identity at inference. No rescaling needed at test time.
+
+**ResidualBlock** — 1×1 projection shortcut when input/output channel dimensions differ, ensuring elementwise addition is always valid regardless of stride or channel expansion.
+
+**ResNet** — configurable depth and width via `num_blocks`, `layer1_channel`, `layer2_channel`, `out_channel` constructor arguments.
