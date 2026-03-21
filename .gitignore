@@ -1,0 +1,32 @@
+# Data — too large to commit, downloaded via Kaggle API
+data/
+*.pkl
+
+# Model weights
+*.pt
+*.pth
+
+# Python
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# Results (add manually after training)
+results/
+
+# Misc
+.DS_Store
+kaggle.json
+```
+
+---
+
+## 7. Write requirements.txt
+```
+torch>=2.0.0
+torchvision>=0.15.0
+numpy
+matplotlib
+Pillow
+pandas
+kaggle
