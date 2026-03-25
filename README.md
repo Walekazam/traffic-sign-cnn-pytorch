@@ -56,7 +56,7 @@ traffic-sign-cnn-pytorch/
 ### Running Locally
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/traffic-sign-cnn-pytorch
+git clone https://github.com/Walekazam/traffic-sign-cnn-pytorch
 cd traffic-sign-cnn-pytorch
 pip install -r requirements.txt
 jupyter notebook Traffic_Sign_CNN.ipynb
