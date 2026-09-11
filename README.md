@@ -33,7 +33,7 @@ All implementations are in `models.py`. `BatchNormalization` and `CustomDropout`
    - Train all five models and plot loss curves
    - Save predictions to `results/`
 
-> **Kaggle API token required.** When prompted, upload your `kaggle.json` file. Get it from [kaggle.com](https://www.kaggle.com), go to Your Profile, then Settings, then API, and finally Create New Token.
+**Kaggle API token required.** When prompted, upload your `kaggle.json` file. Get it from [kaggle.com](https://www.kaggle.com), go to Your Profile, then Settings, then API, and finally Create New Token.
 
 ### Running Locally
 
