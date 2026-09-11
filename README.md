@@ -1,10 +1,8 @@
 # Traffic Sign Classification with Convolutional Neural Networks
 
-A PyTorch deep learning project comparing five CNN architectures on a 4-class road sign detection task, built and trained on Google Colab Pro (A100 GPU).
+A PyTorch deep learning project comparing five CNN architectures on a 4-class road sign detection task that is built and trained on Google Colab Pro.
 
-**Dataset:** [Kaggle Road Sign Detection](https://www.kaggle.com/datasets/andrewmvd/road-sign-detection)  
-**Classes:** Traffic Light · Stop · Speed Limit · Crosswalk  
-**Models:** Baseline CNN → Max Pooling → Batch Normalization → Dropout → ResNet
+**Dataset:** [Kaggle Road Sign Detection](https://www.kaggle.com/datasets/andrewmvd/road-sign-detection) 
 
 ---
 
@@ -22,36 +20,20 @@ All implementations are in `models.py`. `BatchNormalization` and `CustomDropout`
 
 ---
 
-## Project Structure
-
-```
-traffic-sign-cnn-pytorch/
-├── models.py                  # All model architectures and training utilities
-├── Traffic_Sign_CNN.ipynb     # Experiment notebook: data loading, training, results
-├── requirements.txt
-├── .gitignore
-├── README.md
-└── results/
-    ├── loss_curves.png        # Train/val loss curves for all 5 models
-    └── resnet_predictions.csv # ResNet predictions on the held-out test set
-```
-
----
-
-## Quickstart
+## How to Start
 
 ### Running in Google Colab (recommended)
 
 1. Open `Traffic_Sign_CNN.ipynb` in [Google Colab](https://colab.research.google.com)
-2. Set runtime to GPU: Runtime → Change runtime type → A100
-3. Run all cells — the notebook will:
+2. Set runtime to GPU: click Runtime, then Change runtime type, then click A100
+3. When you run all cells, the notebook will:
    - Clone this repo to access `models.py`
    - Download the dataset directly from Kaggle
    - Preprocess images into train/val/test splits
    - Train all five models and plot loss curves
    - Save predictions to `results/`
 
-> **Kaggle API token required.** When prompted, upload your `kaggle.json` file. Get it from [kaggle.com](https://www.kaggle.com) → Your Profile → Settings → API → Create New Token.
+> **Kaggle API token required.** When prompted, upload your `kaggle.json` file. Get it from [kaggle.com](https://www.kaggle.com), go to Your Profile, then Settings, then API, and finally Create New Token.
 
 ### Running Locally
 
@@ -118,16 +100,16 @@ All models are trained with identical settings for a fair comparison:
 - **MaxPooling** improves generalization by reducing spatial dimensions
 - **BatchNorm** produces the smoothest loss curves and fastest convergence
 - **Dropout** shows higher training loss (expected from regularization) but competitive validation performance
-- **ResNet** achieves the best overall validation loss — skip connections enable more effective gradient flow and richer feature learning
+- **ResNet** achieves the best overall validation loss through skip connections which enable more effective gradient flow and richer feature learning
 
 ---
 
 ## Key Implementation Details
 
-**Custom BatchNormalization** — tracks running mean/variance via EMA for inference, applies learnable γ and β per channel, handles (B, C, H, W) broadcasting manually.
+**Custom BatchNormalization**: tracks running mean/variance via EMA for inference, applies learnable γ and β per channel, handles (B, C, H, W) broadcasting manually.
 
-**Custom Dropout** — inverted dropout: scales surviving activations by `1/(1-p)` at training time, identity at inference. No rescaling needed at test time.
+**Custom Dropout**: inverted dropout: scales surviving activations by `1/(1-p)` at training time, identity at inference. No rescaling needed at test time.
 
-**ResidualBlock** — 1×1 projection shortcut when input/output channel dimensions differ, ensuring elementwise addition is always valid regardless of stride or channel expansion.
+**ResidualBlock**: 1×1 projection shortcut when input/output channel dimensions differ, ensuring elementwise addition is always valid regardless of stride or channel expansion.
 
-**ResNet** — configurable depth and width via `num_blocks`, `layer1_channel`, `layer2_channel`, `out_channel` constructor arguments.
+**ResNet**: configurable depth and width via `num_blocks`, `layer1_channel`, `layer2_channel`, `out_channel` constructor arguments.
